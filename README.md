@@ -40,11 +40,11 @@ import browserToBearer from '@curveball/browser-to-bearer';
 const app = new Application();
 
 app.use(browserToBearer({
-  authorizeEndpoint: 'http://auth.example.org/authorize',
-  tokenEndpoint: 'http://auth.example.org/token',
+  authorizeEndpoint: 'https://auth.example.org/authorize',
+  tokenEndpoint: 'https://auth.example.org/token',
   clientId: 'some_client_id',
   clientSecret: 'some_client_secret',
-  publicUri: 'http://resource-server.example.org/', // where to redirect back to
+  publicUri: 'https://resource-server.example.org/', // where to redirect back to
   scope: [], // List of OAuth2 scopes
 });
 
