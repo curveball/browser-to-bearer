@@ -31,13 +31,18 @@ middelware to work correctly. In theory this middleware can work with any
 OAuth2 middleware, but the below example is using the `@curveball/oauth2`
 middleware.
 
+In addition to a working OAuth2 middleware, it also requires a `session`
+middleware.
+
 ```typescript
 import { Application } from '@curveball/core';
 import oauth2 from '@curveball/oauth2';
 import browserToBearer from '@curveball/browser-to-bearer';
-
+import session from '@curveball/session';
 
 const app = new Application();
+
+app.use(session());
 
 app.use(browserToBearer({
   authorizeEndpoint: 'https://auth.example.org/authorize',
