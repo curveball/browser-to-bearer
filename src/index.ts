@@ -181,25 +181,25 @@ function getAuthUrl(options: OAuth2Options, state: string): string {
 }
 
 
-async function responseToErrorMessage(response: Response, op?:string): Promise<string> {
+async function responseToErrorMessage(response: Response, op?: string): Promise<string> {
 
   let message = '';
   if (response.headers.has('Content-Type') && response.headers.get('Content-Type')!.startsWith('application/json')) {
     const jsonBody = await response.json();
     if (jsonBody.error) {
-      message+='Received oauth2 error';
-      if (op) message+=' while ' + op;
-      message+=': '  + jsonBody.error + '.';
+      message += 'Received oauth2 error';
+      if (op) { message += ' while ' + op; }
+      message += ': '  + jsonBody.error + '.';
       if (jsonBody.error_description) {
-        message+=' ' + jsonBody.error_description;
+        message += ' ' + jsonBody.error_description;
       }
-      message+='(HTTP: ' + response.status + ')';
+      message += '(HTTP: ' + response.status + ')';
       return message;
     }
   }
-  message+='Received HTTP error';
-  if (op) message+=' while ' + op;
-  message+=': '  + response.status;
+  message += 'Received HTTP error';
+  if (op) { message += ' while ' + op; }
+  message += ': '  + response.status;
   return message;
 
 }
