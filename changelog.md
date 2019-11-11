@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.1.2 (2019-11-11)
+------------------
+
+* Fix 'redirect_uri' when validating the OAuth2 code
+
+
 0.1.1 (2019-11-11)
 ------------------
 
