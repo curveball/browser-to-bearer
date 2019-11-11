@@ -1,6 +1,6 @@
 import { Context, Middleware } from '@curveball/core';
 import { BadRequest, Forbidden, Unauthorized } from '@curveball/http-errors';
-import fetch from 'node-fetch';
+import { default as fetch, Response } from 'node-fetch';
 import querystring from 'querystring';
 import { resolve } from 'url';
 
@@ -100,7 +100,7 @@ async function handleOAuth2Code(ctx: Context, options: OAuth2Options) {
     body: querystring.stringify(params),
   });
   if (!response.ok) {
-    throw new Error('Received HTTP error when validating authentication code on OAuth2 server: ' + response.status);
+    throw new Error(await responseToErrorMessage(response, 'validating authentication code'));
   }
   const rBody = await response.json();
 
@@ -155,7 +155,7 @@ async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OA
     body: querystring.stringify(params),
   });
   if (!response.ok) {
-    throw new Error('Received HTTP error when refreshing tokens on OAuth2 server: ' + response.status);
+    throw new Error(await responseToErrorMessage(response, 'refreshing tokens on OAuth2 server'));
   }
   const rBody = await response.json();
 
@@ -177,5 +177,29 @@ function getAuthUrl(options: OAuth2Options, state: string): string {
     scope: options.scope.join(' '),
     state
   });
+
+}
+
+
+async function responseToErrorMessage(response: Response, op?: string): Promise<string> {
+
+  let message = '';
+  if (response.headers.has('Content-Type') && response.headers.get('Content-Type')!.startsWith('application/json')) {
+    const jsonBody = await response.json();
+    if (jsonBody.error) {
+      message += 'Received oauth2 error';
+      if (op) { message += ' while ' + op; }
+      message += ': '  + jsonBody.error + '.';
+      if (jsonBody.error_description) {
+        message += ' ' + jsonBody.error_description;
+      }
+      message += '(HTTP: ' + response.status + ')';
+      return message;
+    }
+  }
+  message += 'Received HTTP error';
+  if (op) { message += ' while ' + op; }
+  message += ': '  + response.status;
+  return message;
 
 }
