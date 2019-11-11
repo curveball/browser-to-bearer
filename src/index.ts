@@ -67,7 +67,7 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
 }
 
 /**
- * This route gets called for the /_browser_auth endpoint.
+ * This route gets called for the /_browser-auth endpoint.
  *
  * This endpoint is what a user gets redirected to by the OAuth2 server, after
  * a successful or failed login.
@@ -87,7 +87,7 @@ async function handleOAuth2Code(ctx: Context, options: OAuth2Options) {
   const params = {
     grant_type: 'authorization_code',
     code: code,
-    redirect_uri: options.publicUri,
+    redirect_uri: resolve(options.publicUri, '/_browser-auth'),
     client_id: options.clientId
   };
 
