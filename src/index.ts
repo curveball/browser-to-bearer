@@ -2,6 +2,7 @@ import { Context, Middleware } from '@curveball/core';
 import { BadRequest, Forbidden, Unauthorized } from '@curveball/http-errors';
 import fetch from 'node-fetch';
 import querystring from 'querystring';
+import { resolve } from 'url';
 
 type OAuth2Options = {
   authorizeEndpoint: string,
@@ -27,7 +28,7 @@ export default function(options: OAuth2Options): Middleware {
       return next();
     }
 
-    if (ctx.path === '/_browser_auth') {
+    if (ctx.path === '/_browser-auth') {
       return handleOAuth2Code(ctx, options);
     }
 
@@ -172,7 +173,7 @@ function getAuthUrl(options: OAuth2Options, state: string): string {
   return options.authorizeEndpoint + '?' + querystring.stringify({
     response_type: 'code',
     client_id: options.clientId,
-    redirect_uri: options.publicUri,
+    redirect_uri: resolve(options.publicUri, '/_browser-auth'),
     scope: options.scope.join(' '),
     state
   });
