@@ -124,6 +124,10 @@ type OAuth2Token = {
 
 async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OAuth2Token | null> {
 
+  if (!('session' in ctx.state)) {
+    throw new Error('A session middleware must run before the browser-to-bearer middleware');
+  }
+
   if (!ctx.state.session.oauth2tokens) {
     return null;
   }
