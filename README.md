@@ -42,7 +42,15 @@ import session from '@curveball/session';
 
 const app = new Application();
 
-app.use(session());
+app.use(session({
+  store: 'memory',
+  cookieOptions: {
+    httpOnly: true,
+    // It might be important to set sameSite to false to allow this to work.
+    // Without this, cookies will not be sent along after the first redirect
+    // from the OAuth2 server.
+    sameSite: false,
+}));
 
 app.use(browserToBearer({
   authorizeEndpoint: 'https://auth.example.org/authorize',
