@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.1.1 (2019-11-11)
+------------------
+
+* Emit better error messages when something goes wrong while communicating to
+  OAuth2 server.
+
+
 0.1.0 (2019-11-11)
 ------------------
 
