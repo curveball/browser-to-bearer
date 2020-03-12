@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/curveballjs/browser-to-bearer.git"
+    "url": "git+https://github.com/curveball/browser-to-bearer.git"
   },
   "files": [
     "package.json",
@@ -31,9 +31,9 @@
   "author": "Evert Pot (https://evertpot.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/curveballjs/browser-to-bearer/issues"
+    "url": "https://github.com/curveball/browser-to-bearer/issues"
   },
-  "homepage": "https://github.com/curveballjs/browser-to-bearer#readme",
+  "homepage": "https://github.com/curveball/browser-to-bearer#readme",
   "devDependencies": {
     "@curveball/core": "^0.10.0",
     "@types/chai": "^4.2.7",
@@ -60,5 +60,14 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.0"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "recursive": true,
+    "extension": [
+      "ts",
+      "js",
+      "tsx"
+    ]
   }
 }
