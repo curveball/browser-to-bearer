@@ -50,6 +50,7 @@ app.use(session({
     // Without this, cookies will not be sent along after the first redirect
     // from the OAuth2 server.
     sameSite: false,
+  }
 }));
 
 app.use(browserToBearer({
@@ -62,8 +63,9 @@ app.use(browserToBearer({
 });
 
 app.use(oauth2({
+  whitelist: [],
   introspectionEndpoint: 'https://auth.example.org/introspect'
-});
+}));
 ```
 
 
