@@ -1,5 +1,3 @@
 describe('this package', () => {
-  it('should have tests', () => {
-
-  });
+  it.skip('should have tests');
 });
