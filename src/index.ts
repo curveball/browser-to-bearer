@@ -56,7 +56,7 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
     await next();
   } catch (e) {
     if (e instanceof Unauthorized) {
-      const state = ctx.path;
+      const state = ctx.request.requestTarget;
       const authUrl = getAuthUrl(options, state);
       ctx.response.headers.append('Link', '<' + authUrl + '>; rel="authenticate"');
     }
