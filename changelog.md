@@ -1,10 +1,15 @@
 Changelog
 =========
 
-0.1.4 (?)
+0.1.4 (2020-10-27)
 ------------------
 
-* Typescript target is now es2019 instead of esnext to ensure that older Node.js versions are supported.
+* When redirecting to the OAuth2 authorize endpoint, this library will now
+  use the full path to allow a user to be redirected back to the original
+  page. Before this change the query parameters were stripped.
+* Typescript target is now es2019 instead of esnext to ensure that Node v10
+  is supported.
+* Switch from tslint to eslint.
 
 
 0.1.3 (2020-01-05)
