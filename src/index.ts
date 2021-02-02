@@ -1,7 +1,8 @@
 import { Context, Middleware } from '@curveball/core';
-import { BadRequest, Forbidden, Unauthorized } from '@curveball/http-errors';
+import '@curveball/session'
+import { BadRequest, Unauthorized } from '@curveball/http-errors';
 import { default as fetch, Response } from 'node-fetch';
-import querystring from 'querystring';
+import * as querystring from 'querystring';
 import { resolve } from 'url';
 
 type OAuth2Options = {
@@ -38,9 +39,9 @@ export default function(options: OAuth2Options): Middleware {
       return handleInnerRequest(ctx, next, options);
     }
 
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(ctx.method)) {
-      // For now we only support safe methods.
-      throw new Forbidden('When using cookie-based authentication, only safe methods are supported');
+    if (!['GET', 'HEAD', 'OPTIONS', 'SEARCH'].includes(ctx.method)) {
+      // This is an unsafe method. We will check if there's a CSRF token.
+      ctx.validateCsrf();
     }
 
     ctx.request.headers.set('Authorization', 'Bearer ' + oauth2Tokens.accessToken);

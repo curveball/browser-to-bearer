@@ -35,7 +35,8 @@
   },
   "homepage": "https://github.com/curveball/browser-to-bearer#readme",
   "devDependencies": {
-    "@curveball/core": "^0.14.3",
+    "@curveball/core": "^0.16.1",
+    "@curveball/session": "^0.6.0",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "@types/node": "^10.17.51",
@@ -58,7 +59,8 @@
     ]
   },
   "peerDependencies": {
-    "@curveball/core": ">=0.9.0 <1.0.0"
+    "@curveball/core": ">=0.9.0 <1.0.0",
+    "@curveball/session": "^0.6.0",
   },
   "dependencies": {
     "node-fetch": "^2.6.1"

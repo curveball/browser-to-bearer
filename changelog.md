@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.2.0 (2020-02-02)
+------------------
+
+* Now supports submitting HTML form. This was blocked due to CSRF problems,
+  but we now validate CSRF tokens.
+* This is considered a BC break, as this package requires curveball/session
+  0.6, which itself has introduced a BC breka.
+
+
 0.1.4 (2020-10-27)
 ------------------
 
