@@ -106,7 +106,7 @@ async function handleOAuth2Code(ctx: Context, options: OAuth2Options) {
   const rBody = await response.json();
 
   ctx.response.status = 303;
-  ctx.state.session.oauth2tokens = {
+  ctx.session.oauth2tokens = {
     accessToken: rBody.access_token,
     expires: Date.now() + (rBody.expires_in * 1000),
     refreshToken: rBody.refresh_token,
@@ -116,7 +116,6 @@ async function handleOAuth2Code(ctx: Context, options: OAuth2Options) {
     throw new Error('Sandbox violation');
   }
   ctx.response.headers.set('Location', state);
-
 }
 type OAuth2Token = {
   accessToken: string,
@@ -126,15 +125,15 @@ type OAuth2Token = {
 
 async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OAuth2Token | null> {
 
-  if (!('session' in ctx.state)) {
+  if (!('session' in ctx)) {
     throw new Error('A session middleware must run before the browser-to-bearer middleware');
   }
 
-  if (!ctx.state.session.oauth2tokens) {
+  if (!ctx.session.oauth2tokens) {
     return null;
   }
 
-  const token: OAuth2Token = ctx.state.session.oauth2tokens;
+  const token: OAuth2Token = ctx.session.oauth2tokens;
 
   if (token.expires > Date.now()) {
     return token;
@@ -160,13 +159,13 @@ async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OA
   }
   const rBody = await response.json();
 
-  ctx.state.session.oauth2tokens = {
+  ctx.session.oauth2tokens = {
     accessToken: rBody.access_token,
     expires: Date.now() + (rBody.expires_in * 1000),
     refreshToken: rBody.refresh_token,
   };
 
-  return ctx.state.session.oauth2tokens;
+  return ctx.session.oauth2tokens;
 
 }
 
