@@ -1,5 +1,5 @@
 import { Context, Middleware } from '@curveball/core';
-import '@curveball/session'
+import '@curveball/session';
 import { BadRequest, Unauthorized } from '@curveball/http-errors';
 import { default as fetch, Response } from 'node-fetch';
 import * as querystring from 'querystring';
