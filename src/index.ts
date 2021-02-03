@@ -42,6 +42,7 @@ export default function(options: OAuth2Options): Middleware {
     if (!['GET', 'HEAD', 'OPTIONS', 'SEARCH'].includes(ctx.method)) {
       // This is an unsafe method. We will check if there's a CSRF token.
       ctx.validateCsrf();
+      delete (ctx.request.body as any)['csrf-token']
     }
 
     ctx.request.headers.set('Authorization', 'Bearer ' + oauth2Tokens.accessToken);
