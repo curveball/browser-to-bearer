@@ -1,13 +1,13 @@
 Changelog
 =========
 
-0.2.1 (2020-02-02)
+0.2.1 (2021-02-02)
 ------------------
 
 * Storing oauth2 tokens was completely broken.
 
 
-0.2.0 (2020-02-02)
+0.2.0 (2021-02-02)
 ------------------
 
 * Now supports submitting HTML form. This was blocked due to CSRF problems,
