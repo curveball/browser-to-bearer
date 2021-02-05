@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.2.2 (2021-02-04)
+------------------
+
+* Delete CSRF token from the body after validating.
+
+
 0.2.1 (2021-02-02)
 ------------------
 
