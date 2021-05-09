@@ -6,12 +6,12 @@ import * as querystring from 'querystring';
 import { resolve } from 'url';
 
 type OAuth2Options = {
-  authorizeEndpoint: string,
-  clientId: string,
-  clientSecret: string,
-  publicUri: string,
-  scope: string[],
-  tokenEndpoint: string,
+  authorizeEndpoint: string;
+  clientId: string;
+  clientSecret: string;
+  publicUri: string;
+  scope: string[];
+  tokenEndpoint: string;
 };
 
 /**
@@ -119,9 +119,9 @@ async function handleOAuth2Code(ctx: Context, options: OAuth2Options) {
   ctx.response.headers.set('Location', state);
 }
 type OAuth2Token = {
-  accessToken: string,
-  expires: number,
-  refreshToken: string,
+  accessToken: string;
+  expires: number;
+  refreshToken: string;
 };
 
 async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OAuth2Token | null> {
