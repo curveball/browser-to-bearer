@@ -7,7 +7,9 @@
     "prepublishOnly": "make build",
     "test": "make lint test",
     "tsc": "tsc",
-    "start": "make start"
+    "start": "make start",
+    "lint": "make lint",
+    "fix": "make fix"
   },
   "repository": {
     "type": "git",
