@@ -1,17 +1,17 @@
 import { Context, Middleware } from '@curveball/core';
 import '@curveball/session';
-import { BadRequest, Unauthorized } from '@curveball/http-errors';
-import { default as fetch, Response } from 'node-fetch';
-import * as querystring from 'querystring';
+import { Unauthorized } from '@curveball/http-errors';
 import { resolve } from 'url';
+import {
+  OAuth2Client,
+  OAuth2Token,
+  OAuth2AuthorizationCodeClient
+} from 'fetch-mw-oauth2';
 
 type OAuth2Options = {
-  authorizeEndpoint: string;
-  clientId: string;
-  clientSecret: string;
+  client: OAuth2Client;
   publicUri: string;
   scope: string[];
-  tokenEndpoint: string;
 };
 
 /**
@@ -24,19 +24,25 @@ export default function(options: OAuth2Options): Middleware {
 
   return async (ctx, next) => {
 
+    const authCodeClient = options.client.authorizationCode({
+      redirectUri: resolve(options.publicUri, '/_browser-auth'),
+      state: ctx.state.requestTarget
+    });
+
+
     if (ctx.request.headers.has('Authorization')) {
       // If there already was an Authorization header, use that.
       return next();
     }
 
     if (ctx.path === '/_browser-auth') {
-      return handleOAuth2Code(ctx, options);
+      return handleOAuth2Code(ctx, authCodeClient);
     }
 
     const oauth2Tokens = await getOAuth2Tokens(ctx, options);
     if (!oauth2Tokens) {
       // No active tokens
-      return handleInnerRequest(ctx, next, options);
+      return handleInnerRequest(ctx, next, authCodeClient);
     }
 
     if (!['GET', 'HEAD', 'OPTIONS', 'SEARCH'].includes(ctx.method)) {
@@ -46,20 +52,19 @@ export default function(options: OAuth2Options): Middleware {
     }
 
     ctx.request.headers.set('Authorization', 'Bearer ' + oauth2Tokens.accessToken);
-    return handleInnerRequest(ctx, next, options);
+    return handleInnerRequest(ctx, next, authCodeClient);
 
   };
 
 }
 
-async function handleInnerRequest(ctx: Context, next: () => void | Promise<void> , options: OAuth2Options) {
+async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>, authCodeClient: OAuth2AuthorizationCodeClient) {
 
   try {
     await next();
   } catch (e) {
     if (e instanceof Unauthorized) {
-      const state = ctx.request.requestTarget;
-      const authUrl = getAuthUrl(options, state);
+      const authUrl = await authCodeClient.getAuthorizeUri();
       ctx.response.headers.append('Link', '<' + authUrl + '>; rel="authenticate"');
     }
     throw e;
@@ -76,53 +81,19 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
  *
  * https://tools.ietf.org/html/rfc6749#section-4.1.2
  */
-async function handleOAuth2Code(ctx: Context, options: OAuth2Options) {
+async function handleOAuth2Code(ctx: Context, authCodeClient: OAuth2AuthorizationCodeClient) {
 
-  if (ctx.query.error) {
-    throw new Error('Error from OAuth2 server: ' + ctx.query.error);
-  }
-
-  if (!ctx.query.code) {
-    throw new BadRequest('A "code" query parameter was expected');
-  }
-  const code = ctx.query.code;
-  const params = {
-    grant_type: 'authorization_code',
-    code: code,
-    redirect_uri: resolve(options.publicUri, '/_browser-auth'),
-    client_id: options.clientId
-  };
-
-  const response = await fetch(options.tokenEndpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Basic ' + Buffer.from(options.clientId + ':' + options.clientSecret).toString('base64'),
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: querystring.stringify(params),
-  });
-  if (!response.ok) {
-    throw new Error(await responseToErrorMessage(response, 'validating authentication code'));
-  }
-  const rBody = await response.json();
+  const result = await authCodeClient.validateResponse(ctx.request.requestTarget);
+  const token = authCodeClient.getToken(result);
 
   ctx.response.status = 303;
-  ctx.session.oauth2tokens = {
-    accessToken: rBody.access_token,
-    expires: Date.now() + (rBody.expires_in * 1000),
-    refreshToken: rBody.refresh_token,
-  };
+  ctx.session.oauth2tokens = token;
   const state = ctx.query.state || '/';
   if (!state.startsWith('/') || state.startsWith('//')) {
     throw new Error('Sandbox violation');
   }
   ctx.response.headers.set('Location', state);
 }
-type OAuth2Token = {
-  accessToken: string;
-  expires: number;
-  refreshToken: string;
-};
 
 async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OAuth2Token | null> {
 
@@ -136,71 +107,13 @@ async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OA
 
   const token: OAuth2Token = ctx.session.oauth2tokens;
 
-  if (token.expires > Date.now()) {
+  if (!token.expiresAt || token.expiresAt * 1000 > Date.now()) {
     return token;
   }
 
-  // Attempt to refresh token
-  const params = {
-    grant_type: 'refresh_token',
-    refresh_token: token.refreshToken,
-    client_id: options.clientId
-  };
+  const newToken = await options.client.refreshToken(token);
 
-  const response = await fetch(options.tokenEndpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Basic ' + Buffer.from(options.clientId + ':' + options.clientSecret).toString('base64'),
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: querystring.stringify(params),
-  });
-  if (!response.ok) {
-    throw new Error(await responseToErrorMessage(response, 'refreshing tokens on OAuth2 server'));
-  }
-  const rBody = await response.json();
-
-  ctx.session.oauth2tokens = {
-    accessToken: rBody.access_token,
-    expires: Date.now() + (rBody.expires_in * 1000),
-    refreshToken: rBody.refresh_token,
-  };
-
-  return ctx.session.oauth2tokens;
-
-}
-
-function getAuthUrl(options: OAuth2Options, state: string): string {
-  return options.authorizeEndpoint + '?' + querystring.stringify({
-    response_type: 'code',
-    client_id: options.clientId,
-    redirect_uri: resolve(options.publicUri, '/_browser-auth'),
-    scope: options.scope.join(' '),
-    state
-  });
-
-}
-
-
-async function responseToErrorMessage(response: Response, op?: string): Promise<string> {
-
-  let message = '';
-  if (response.headers.has('Content-Type') && response.headers.get('Content-Type')!.startsWith('application/json')) {
-    const jsonBody = await response.json();
-    if (jsonBody.error) {
-      message += 'Received oauth2 error';
-      if (op) { message += ' while ' + op; }
-      message += ': '  + jsonBody.error + '.';
-      if (jsonBody.error_description) {
-        message += ' ' + jsonBody.error_description;
-      }
-      message += '(HTTP: ' + response.status + ')';
-      return message;
-    }
-  }
-  message += 'Received HTTP error';
-  if (op) { message += ' while ' + op; }
-  message += ': '  + response.status;
-  return message;
+  ctx.session.oauth2tokens = newToken;
+  return newToken;
 
 }

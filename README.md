@@ -20,7 +20,7 @@ with a browser, which otherwise is pretty hard to do.
 Installation
 ------------
 
-    npm install @curveball/browser-to-bearer
+    npm install @curveball/browser-to-bearer fetch-mw-oauth2@2
 
 
 Getting started
@@ -42,6 +42,27 @@ import session from '@curveball/session';
 
 const app = new Application();
 
+const client = OAuth2Client({
+
+  server: 'https://auth.example/',
+  clientId: 'My-app',
+  clientSecret: 'some_client_secret',
+
+  /**
+   * Only specify these if your OAuth2 server _doesn't_ support auto
+   * discovery of these endpoints.
+   *
+   * If your server does support auto-discovery (through the OAuth2
+   * Authorization Metadata document), it's better to omit these as
+   * it will future-proof your code.
+   */
+  authorizeEndpoint: '/authorize',
+  tokenEndpoint: '/token',
+  introspectionEndpoint: '/introspect',
+
+});
+
+
 app.use(session({
   store: 'memory',
   cookieOptions: {
@@ -54,19 +75,19 @@ app.use(session({
 }));
 
 app.use(browserToBearer({
-  authorizeEndpoint: 'https://auth.example.org/authorize',
-  tokenEndpoint: 'https://auth.example.org/token',
-  clientId: 'some_client_id',
-  clientSecret: 'some_client_secret',
-  publicUri: 'https://resource-server.example.org/', // where to redirect back to
+  // The public URL of this server.
+  //
+  // this is the url that the user will redirect back to after authentication.
+  // only the base URL is required, the middleware handles the rest.
+  publicUri: 'https://resource-server.example.org/',
+  client,
   scope: [], // List of OAuth2 scopes
 });
 
 app.use(oauth2({
   whitelist: [],
-  introspectionEndpoint: 'https://auth.example.org/introspect'
+  client,
 }));
 ```
-
 
 [1]: https://github.com/curveball/
