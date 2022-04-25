@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.1 (2022-04-25) (alpha)
+--------------------------
+
+* Ensure we polyfill Web Crypto with Node Crypto.
+
+
 0.3.0 (2022-04-25) ALPHA
 ------------------------
 
