@@ -62,7 +62,7 @@
     "@curveball/session": "^0.6.1"
   },
   "dependencies": {
-    "fetch-mw-oauth2": "^2.0.2"
+    "fetch-mw-oauth2": "^2.0.6"
   },
   "engines": {
     "node": ">=18"
