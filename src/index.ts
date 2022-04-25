@@ -5,13 +5,13 @@ import { resolve } from 'url';
 import {
   OAuth2Client,
   OAuth2Token,
-  OAuth2AuthorizationCodeClient
+  OAuth2AuthorizationCodeClient,
+  generateCodeVerifier,
 } from 'fetch-mw-oauth2';
 
 type OAuth2Options = {
   client: OAuth2Client;
-  publicUri: string;
-  scope: string[];
+  scope?: string[];
 };
 
 /**
@@ -24,8 +24,12 @@ export default function(options: OAuth2Options): Middleware {
 
   return async (ctx, next) => {
 
+    if (!ctx.session.oauth2CodeVerifier) {
+      ctx.session.oauth2CodeVerifier = generateCodeVerifier();
+    }
+
     const authCodeClient = options.client.authorizationCode({
-      redirectUri: resolve(options.publicUri, '/_browser-auth'),
+      redirectUri: resolve(ctx.request.origin, '/_browser-auth'),
       state: ctx.state.requestTarget
     });
 
