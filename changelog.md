@@ -5,6 +5,7 @@ Changelog
 ------------------------
 
 * Now uses `fetch-mw-oauth2` for all the OAuth2 interactions.
+* PKCE support.
 * The setup of the middleware changed. Refer to the documentation to see
   how it's done.
 * The `publicUri` setting is gone, set `CURVEBALL_ORIGIN` instead, or leave
