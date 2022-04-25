@@ -20,8 +20,13 @@ with a browser, which otherwise is pretty hard to do.
 Installation
 ------------
 
-    npm install @curveball/browser-to-bearer fetch-mw-oauth2@2
+    npm install @curveball/browser-to-bearer@0.2 @curveball/oauth2@0.3 fetch-mw-oauth2@2
 
+The [`@curveball/oauth2`][2] curveball middleware is not required. If you have a
+custom middleware that listens for a `Authorization: Bearer` HTTP header, this
+should also work.
+
+The examples below assume you use the `@curveball/oauth2` middleware though.
 
 Getting started
 ---------------
@@ -75,19 +80,29 @@ app.use(session({
 }));
 
 app.use(browserToBearer({
-  // The public URL of this server.
-  //
-  // this is the url that the user will redirect back to after authentication.
-  // only the base URL is required, the middleware handles the rest.
-  publicUri: 'https://resource-server.example.org/',
   client,
-  scope: [], // List of OAuth2 scopes
 });
 
 app.use(oauth2({
-  whitelist: [],
   client,
 }));
 ```
 
-[1]: https://github.com/curveball/
+
+Setting the right origin
+------------------------
+
+By default Curveball will assume you are running this package on
+`http://localhost`, which breaks the redirect back from the authentication
+server to your app.
+
+To fix this, either:
+
+1. Set the `CURVEBALL_ORIGIN` environment variable. This is recommended in
+   most modern deployments. It should have a value such as
+   `https://domain.example` without any slashes in the end.
+2. Set `app.origin = 'https://domain.example`. This is done on the main
+   Curveball application object.
+
+[1]: https://github.com/curveball/core
+[2]: https://github.com/curveball/oauth2

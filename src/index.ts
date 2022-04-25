@@ -10,8 +10,7 @@ import {
 
 type OAuth2Options = {
   client: OAuth2Client;
-  publicUri: string;
-  scope: string[];
+  scope?: string[];
 };
 
 /**
@@ -25,7 +24,7 @@ export default function(options: OAuth2Options): Middleware {
   return async (ctx, next) => {
 
     const authCodeClient = options.client.authorizationCode({
-      redirectUri: resolve(options.publicUri, '/_browser-auth'),
+      redirectUri: resolve(ctx.request.origin, '/_browser-auth'),
       state: ctx.state.requestTarget
     });
 
