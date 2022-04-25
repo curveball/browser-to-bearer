@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.2 (2022-04-24) (alpha)
+--------------------------
+
+* Fix response validation to use absolute url.
+
+
 0.3.1 (2022-04-25) (alpha)
 --------------------------
 

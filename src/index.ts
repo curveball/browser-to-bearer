@@ -91,7 +91,7 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
  */
 async function handleOAuth2Code(ctx: Context, authCodeClient: OAuth2AuthorizationCodeClient) {
 
-  const result = await authCodeClient.validateResponse(ctx.request.requestTarget);
+  const result = await authCodeClient.validateResponse(ctx.request.absoluteUrl);
   const token = authCodeClient.getToken(result);
 
   ctx.response.status = 303;
