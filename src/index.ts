@@ -1,11 +1,9 @@
 import { Context, Middleware } from '@curveball/core';
 import '@curveball/session';
 import { Unauthorized } from '@curveball/http-errors';
-import { resolve } from 'url';
 import {
   OAuth2Client,
   OAuth2Token,
-  OAuth2AuthorizationCodeClient,
   generateCodeVerifier,
 } from 'fetch-mw-oauth2';
 
@@ -13,6 +11,14 @@ type OAuth2Options = {
   client: OAuth2Client;
   scope?: string[];
 };
+
+type OAuth2CodeData = {
+  state: string;
+  redirectUri: string;
+  codeVerifier: string;
+  continueUrl: string;
+}
+
 
 // If there's no global 'crypto', load Node's.
 if (!global.crypto) global.crypto = require('crypto');
@@ -28,29 +34,25 @@ export default function(options: OAuth2Options): Middleware {
 
   return async (ctx, next) => {
 
-    if (!ctx.session.oauth2CodeVerifier) {
-      ctx.session.oauth2CodeVerifier = generateCodeVerifier();
-    }
-
-    const authCodeClient = options.client.authorizationCode({
-      redirectUri: resolve(ctx.request.origin, '/_browser-auth'),
-      state: ctx.state.requestTarget
-    });
-
+    const oauth2Client = options.client;
 
     if (ctx.request.headers.has('Authorization')) {
       // If there already was an Authorization header, use that.
       return next();
     }
+    if (!('session' in ctx)) {
+      throw new Error('A session middleware must run before the browser-to-bearer middleware');
+    }
 
     if (ctx.path === '/_browser-auth') {
-      return handleOAuth2Code(ctx, authCodeClient);
+      // We got redirected back after authorization
+      return handleOAuth2Code(ctx, oauth2Client);
     }
 
     const oauth2Tokens = await getOAuth2Tokens(ctx, options);
     if (!oauth2Tokens) {
-      // No active tokens
-      return handleInnerRequest(ctx, next, authCodeClient);
+      // No OAUth2 tokens found
+      return handleInnerRequest(ctx, next, oauth2Client);
     }
 
     if (!['GET', 'HEAD', 'OPTIONS', 'SEARCH'].includes(ctx.method)) {
@@ -60,19 +62,33 @@ export default function(options: OAuth2Options): Middleware {
     }
 
     ctx.request.headers.set('Authorization', 'Bearer ' + oauth2Tokens.accessToken);
-    return handleInnerRequest(ctx, next, authCodeClient);
+    return handleInnerRequest(ctx, next, oauth2Client);
 
   };
 
 }
 
-async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>, authCodeClient: OAuth2AuthorizationCodeClient) {
+async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>, oauth2Client: OAuth2Client) {
 
   try {
     await next();
   } catch (e) {
     if (e instanceof Unauthorized) {
-      const authUrl = await authCodeClient.getAuthorizeUri();
+
+      const codeData: OAuth2CodeData = {
+        // Re-using the code-verifier function. It's really just a random string
+        state: generateCodeVerifier(),
+        codeVerifier: generateCodeVerifier(),
+        redirectUri: ctx.request.origin + '/_browser-auth',
+        // This property is not a fetch-mw-oauth2 property, but we use it to
+        // know where to send the user after a successful auth. All of this is
+        // kept in the session.
+        continueUrl: ctx.request.requestTarget,
+      };
+
+      ctx.session.oauth2CodeData = codeData;
+
+      const authUrl = await oauth2Client.authorizationCode.getAuthorizeUri(codeData);
       ctx.response.headers.append('Link', '<' + authUrl + '>; rel="authenticate"');
     }
     throw e;
@@ -89,25 +105,23 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
  *
  * https://tools.ietf.org/html/rfc6749#section-4.1.2
  */
-async function handleOAuth2Code(ctx: Context, authCodeClient: OAuth2AuthorizationCodeClient) {
+async function handleOAuth2Code(ctx: Context, oauth2Client: OAuth2Client) {
 
-  const result = await authCodeClient.validateResponse(ctx.request.absoluteUrl);
-  const token = authCodeClient.getToken(result);
+  const codeData: OAuth2CodeData = ctx.session.oauth2CodeData;
+
+  const token = await oauth2Client.authorizationCode.getTokenFromCodeRedirect(
+    ctx.request.absoluteUrl,
+    codeData
+  );
 
   ctx.response.status = 303;
   ctx.session.oauth2tokens = token;
-  const state = ctx.query.state || '/';
-  if (!state.startsWith('/') || state.startsWith('//')) {
-    throw new Error('Sandbox violation');
-  }
-  ctx.response.headers.set('Location', state);
+  delete ctx.session.oauth2CodeData;
+
+  ctx.response.headers.set('Location', codeData.continueUrl);
 }
 
 async function getOAuth2Tokens(ctx: Context, options: OAuth2Options): Promise<OAuth2Token | null> {
-
-  if (!('session' in ctx)) {
-    throw new Error('A session middleware must run before the browser-to-bearer middleware');
-  }
 
   if (!ctx.session.oauth2tokens) {
     return null;
