@@ -1,6 +1,6 @@
 {
   "name": "@curveball/browser-to-bearer",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "This middleware adds browser login support to OAuth2 resource servers",
   "main": "dist/index.js",
   "scripts": {
