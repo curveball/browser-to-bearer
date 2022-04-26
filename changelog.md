@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.4 (2022-04-26) (alpha)
+-------------------------
+
+* Require `fetch-mw-oauth2` 2.0.9, which has a critical bug fix.
+
+
 0.3.3 (2022-04-26) (alpha)
 --------------------------
 
