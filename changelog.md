@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.3 (2022-04-26) (alpha)
+--------------------------
+
+* Updates to support most recent fetch-mw-oauth2 changes.
+
+
 0.3.2 (2022-04-24) (alpha)
 --------------------------
 
