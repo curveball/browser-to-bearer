@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.3.5 (2022-07-14)
+------------------
+
+* Allow installation with `@curveball/session` 0.7 peerDependency.
+* Switch from `fetch-mw-oauth2` to `@badgateway/oauth2-client`.
+
+
 0.3.4 (2022-04-26) (alpha)
 -------------------------
 
