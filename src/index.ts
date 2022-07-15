@@ -77,8 +77,8 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
 
       const codeData: OAuth2CodeData = {
         // Re-using the code-verifier function. It's really just a random string
-        state: generateCodeVerifier(),
-        codeVerifier: generateCodeVerifier(),
+        state: await generateCodeVerifier(),
+        codeVerifier: await generateCodeVerifier(),
         redirectUri: ctx.request.origin + '/_browser-auth',
         // This property is not a fetch-mw-oauth2 property, but we use it to
         // know where to send the user after a successful auth. All of this is
