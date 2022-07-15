@@ -20,7 +20,7 @@ with a browser, which otherwise is pretty hard to do.
 Installation
 ------------
 
-    npm install @curveball/browser-to-bearer@0.3 @curveball/oauth2@0.3 fetch-mw-oauth2@2
+    npm install @curveball/browser-to-bearer @curveball/oauth2@0.3 @badgateway/oauth2-client
 
 The [`@curveball/oauth2`][2] curveball middleware is not required. If you have a
 custom middleware that listens for a `Authorization: Bearer` HTTP header, this
@@ -44,6 +44,7 @@ import { Application } from '@curveball/core';
 import oauth2 from '@curveball/oauth2';
 import browserToBearer from '@curveball/browser-to-bearer';
 import session from '@curveball/session';
+import { OAuth2Client } from '@badgateway/oauth2-client';
 
 const app = new Application();
 
