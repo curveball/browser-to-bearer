@@ -5,7 +5,7 @@ import {
   OAuth2Client,
   OAuth2Token,
   generateCodeVerifier,
-} from 'fetch-mw-oauth2';
+} from '@badgateway/oauth2-client';
 
 type OAuth2Options = {
   client: OAuth2Client;
