@@ -59,8 +59,8 @@
     ]
   },
   "peerDependencies": {
-    "@curveball/kernel": "^0.20.0",
-    "@curveball/session": ">=0.6.1 <1.0.0"
+    "@curveball/kernel": ">=0.20.0 <1",
+    "@curveball/session": ">=0.6.1 <1"
   },
   "engines": {
     "node": ">=14"

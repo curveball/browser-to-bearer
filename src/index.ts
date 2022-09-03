@@ -1,4 +1,4 @@
-import { Context, Middleware } from '@curveball/core';
+import { Context, Middleware } from '@curveball/kernel';
 import '@curveball/session';
 import { Unauthorized } from '@curveball/http-errors';
 import {
