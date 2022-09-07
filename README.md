@@ -62,7 +62,7 @@ const client = OAuth2Client({
    * Authorization Metadata document), it's better to omit these as
    * it will future-proof your code.
    */
-  authorizeEndpoint: '/authorize',
+  authorizationEndpoint: '/authorize',
   tokenEndpoint: '/token',
   introspectionEndpoint: '/introspect',
 
