@@ -82,7 +82,7 @@ app.use(session({
 
 app.use(browserToBearer({
   client,
-});
+}));
 
 app.use(oauth2({
   client,
