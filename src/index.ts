@@ -14,6 +14,7 @@ type OAuth2Options = {
 
 type OAuth2CodeData = {
   state: string;
+  scope: string[];
   redirectUri: string;
   codeVerifier: string;
   continueUrl: string;
@@ -52,7 +53,7 @@ export default function(options: OAuth2Options): Middleware {
     const oauth2Tokens = await getOAuth2Tokens(ctx, options);
     if (!oauth2Tokens) {
       // No OAUth2 tokens found
-      return handleInnerRequest(ctx, next, oauth2Client);
+      return handleInnerRequest(ctx, next, options);
     }
 
     if (!['GET', 'HEAD', 'OPTIONS', 'SEARCH'].includes(ctx.method)) {
@@ -62,13 +63,13 @@ export default function(options: OAuth2Options): Middleware {
     }
 
     ctx.request.headers.set('Authorization', 'Bearer ' + oauth2Tokens.accessToken);
-    return handleInnerRequest(ctx, next, oauth2Client);
+    return handleInnerRequest(ctx, next, options);
 
   };
 
 }
 
-async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>, oauth2Client: OAuth2Client) {
+async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>, options: OAuth2Options) {
 
   try {
     await next();
@@ -78,6 +79,7 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
       const codeData: OAuth2CodeData = {
         // Re-using the code-verifier function. It's really just a random string
         state: await generateCodeVerifier(),
+        scope: options.scope || [],
         codeVerifier: await generateCodeVerifier(),
         redirectUri: ctx.request.origin + '/_browser-auth',
         // This property is not a fetch-mw-oauth2 property, but we use it to
@@ -88,7 +90,7 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
 
       ctx.session.oauth2CodeData = codeData;
 
-      const authUrl = await oauth2Client.authorizationCode.getAuthorizeUri(codeData);
+      const authUrl = await options.client.authorizationCode.getAuthorizeUri(codeData);
       ctx.response.headers.append('Link', '<' + authUrl + '>; rel="authenticate"');
     }
     throw e;
