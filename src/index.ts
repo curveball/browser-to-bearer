@@ -109,6 +109,10 @@ async function handleInnerRequest(ctx: Context, next: () => void | Promise<void>
  */
 async function handleOAuth2Code(ctx: Context, oauth2Client: OAuth2Client) {
 
+  if (ctx.session.oauth2CodeData === undefined) {
+    throw new Error('No OAuth2 information was found in the browser session data. Some possible reasons might be that the browser didn\'t store cookies, your application runs on multiple servers but you don\'t use a central session store.');
+  }
+
   const codeData: OAuth2CodeData = ctx.session.oauth2CodeData;
 
   const token = await oauth2Client.authorizationCode.getTokenFromCodeRedirect(
