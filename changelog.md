@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.4.3 (2022-10-11)
+------------------
+
+* Throw a better error when session data is missing.
+
+
 0.4.2 (2022-10-01)
 ------------------
 
