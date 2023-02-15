@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.5.0 (????-??-??)
+------------------
+
+* This package now supports ESM and CommonJS modules.
+* No longer supports Node 14. Please use Node 16 or higher.
+
+
 0.4.3 (2022-10-11)
 ------------------
 
@@ -32,39 +39,44 @@ Changelog
 * Switch from `fetch-mw-oauth2` to `@badgateway/oauth2-client`.
 
 
-0.3.4 (2022-04-26) (alpha)
--------------------------
+0.3.4 (2022-04-26)
+------------------
 
+* Alpha release.
 * Require `fetch-mw-oauth2` 2.0.9, which has a critical bug fix.
 
 
-0.3.3 (2022-04-26) (alpha)
---------------------------
+0.3.3 (2022-04-26)
+------------------
 
+* Alpha release.
 * Updates to support most recent fetch-mw-oauth2 changes.
 
 
-0.3.2 (2022-04-24) (alpha)
---------------------------
+0.3.2 (2022-04-24)
+------------------
 
+* Alpha release.
 * Fix response validation to use absolute url.
 
 
-0.3.1 (2022-04-25) (alpha)
---------------------------
+0.3.1 (2022-04-25)
+------------------
 
+* Alpha release.
 * Ensure we polyfill Web Crypto with Node Crypto.
 
 
-0.3.0 (2022-04-25) ALPHA
-------------------------
+0.3.0 (2022-04-25)
+------------------
 
+* Alpha release.
 * Now uses `fetch-mw-oauth2` for all the OAuth2 interactions.
 * PKCE support.
-* The setup of the middleware changed. Refer to the documentation to see
-  how it's done.
-* The `publicUri` setting is gone, set `CURVEBALL_ORIGIN` instead, or leave
-  it default for `http://localhost`.
+* The setup of the middleware changed. Refer to the documentation to see how
+  it's done.
+* The `publicUri` setting is gone, set `CURVEBALL_ORIGIN` instead, or leave it
+  default for `http://localhost`.
 
 
 0.2.2 (2021-02-04)
@@ -82,8 +94,8 @@ Changelog
 0.2.0 (2021-02-02)
 ------------------
 
-* Now supports submitting HTML form. This was blocked due to CSRF problems,
-  but we now validate CSRF tokens.
+* Now supports submitting HTML form. This was blocked due to CSRF problems, but
+  we now validate CSRF tokens.
 * This is considered a BC break, as this package requires curveball/session
   0.6, which itself has introduced a BC breka.
 
@@ -91,11 +103,11 @@ Changelog
 0.1.4 (2020-10-27)
 ------------------
 
-* When redirecting to the OAuth2 authorize endpoint, this library will now
-  use the full path to allow a user to be redirected back to the original
-  page. Before this change the query parameters were stripped.
-* Typescript target is now es2019 instead of esnext to ensure that Node v10
-  is supported.
+* When redirecting to the OAuth2 authorize endpoint, this library will now use
+  the full path to allow a user to be redirected back to the original page.
+  Before this change the query parameters were stripped.
+* Typescript target is now es2019 instead of esnext to ensure that Node v10 is
+  supported.
 * Switch from tslint to eslint.
 
 
