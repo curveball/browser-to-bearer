@@ -52,7 +52,7 @@ export default function(options: OAuth2Options): Middleware {
 
     const oauth2Tokens = await getOAuth2Tokens(ctx, options);
     if (!oauth2Tokens) {
-      // No OAUth2 tokens found
+      // No OAuth2 tokens found
       return handleInnerRequest(ctx, next, options);
     }
 
