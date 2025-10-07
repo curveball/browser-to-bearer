@@ -1,7 +1,13 @@
 Changelog
 =========
 
-1.0.0 (????-??-??)
+1.1.0 (????-??-??)
+------------------
+
+* Updated all dependencies, including an update to @badgatway/oauth2-client.
+
+
+1.0.0 (2024-01-17)
 ------------------
 
 * Finally! Curveball v1. Only took 6 years.
@@ -10,6 +16,7 @@ Changelog
   ESM is the future, so we're dropping CommonJS.
 * Now requires Node 18.
 * Upgraded to Typescript 5.3.
+
 
 
 0.5.0 (2023-02-15)
