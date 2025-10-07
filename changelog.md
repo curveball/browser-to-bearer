@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1.0 (????-??-??)
+1.1.0 (2025-10-07)
 ------------------
 
 * Updated all dependencies, including an update to @badgatway/oauth2-client.
@@ -16,7 +16,6 @@ Changelog
   ESM is the future, so we're dropping CommonJS.
 * Now requires Node 18.
 * Upgraded to Typescript 5.3.
-
 
 
 0.5.0 (2023-02-15)
