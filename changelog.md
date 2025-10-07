@@ -1,7 +1,13 @@
 Changelog
 =========
 
-1.0.0 (????-??-??)
+1.1.0 (2025-10-07)
+------------------
+
+* Updated all dependencies, including an update to @badgatway/oauth2-client.
+
+
+1.0.0 (2024-01-17)
 ------------------
 
 * Finally! Curveball v1. Only took 6 years.
