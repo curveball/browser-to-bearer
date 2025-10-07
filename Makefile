@@ -8,7 +8,7 @@ build: dist/build
 
 .PHONY:test
 test:
-	npx nyc mocha
+	npx tsx --test ${TEST_FILES}
 
 .PHONY:lint
 lint:

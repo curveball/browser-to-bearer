@@ -20,11 +20,6 @@ type OAuth2CodeData = {
   continueUrl: string;
 }
 
-
-// If there's no global 'crypto', load Node's.
-if (!global.crypto) global.crypto = require('crypto');
-
-
 /**
  * This middleware allows OAuth2 bearer tokens to be specified as cookies.
  *
